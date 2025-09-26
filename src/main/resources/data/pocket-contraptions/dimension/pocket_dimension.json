@@ -1,0 +1,13 @@
+{
+  "type": "pocket-contraptions:pocket_dimension_type",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "pocket-contraptions:pocket_dimension_biome",
+      "lakes": false,
+      "features": false,
+      "layers": [],
+      "structure-overrides": []
+    }
+  }
+}

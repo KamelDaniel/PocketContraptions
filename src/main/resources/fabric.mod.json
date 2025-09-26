@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "pocket-contraptions",
+	"version": "${version}",
+	"name": "Pocket Contraptions",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/pocket-contraptions/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"io.github.kameldaniel.PocketContraptions"
+		],
+		"client": [
+			"io.github.kameldaniel.PocketContraptionsClient"
+		]
+	},
+	"mixins": [
+		"pocket-contraptions.mixins.json",
+		{
+			"config": "pocket-contraptions.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.17.2",
+		"minecraft": "~1.21.8",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

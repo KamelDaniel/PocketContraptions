@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "# #",
+    " # "
+  ],
+  "key": {
+    "#": "minecraft:ender_pearl"
+  },
+  "result": {
+    "id": "pocket-contraptions:quantum_core",
+    "count": 1
+  }
+}
