@@ -7,35 +7,43 @@ import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateType;
 import net.minecraft.world.World;
 
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.Stack;
 
 public class ModData extends PersistentState {
-    public int nextDimID = 0;
-    Stack<Integer> unreachableIDs = new Stack<>();
+    public int nextDimID;
 
-    private ModData() {}
-
-    private ModData(String data) {
-        Arrays.stream(data.split("\\s+")).mapToInt(Integer::valueOf).forEach(unreachableIDs::push);
-        this.nextDimID = this.unreachableIDs.pop();
+    /**
+     * Constructor for a new world that does not yet have ModData stored.
+     */
+    private ModData() {
+        this.nextDimID = 0;
     }
 
-    private String getSaveString() {
-        StringBuilder saveString = new StringBuilder();
-        while (!this.unreachableIDs.empty()) {
-            saveString.append(this.unreachableIDs.pop()).append(" ");
-        }
-        saveString.append(this.nextDimID);
-        return saveString.toString();
+    /**
+     * Constructor for ModData in a server that already has ModData stored.
+     * @param nextDimID
+     * The value stored in the server
+     */
+    private ModData(int nextDimID) {
+        this.nextDimID = nextDimID;
     }
 
-    private static final Codec<ModData> CODEC = Codec.STRING.fieldOf("dim_ids").codec().xmap(
+    /**
+     * Access the variable that is saved on the server
+     * @return
+     * nextDimID in ModData
+     */
+    private int getSaveData() {
+        return this.nextDimID;
+    }
+
+    // The Codec that stores nextDimID on the server
+    private static final Codec<ModData> CODEC = Codec.INT.fieldOf("next_dim_id").codec().xmap(
             ModData::new,
-            ModData::getSaveString
+            ModData::getSaveData
     );
 
+    // The PersistentStateType that the server checks for to initialize/retrieve.
     private static final PersistentStateType<ModData> type = new PersistentStateType<>(
             PocketContraptions.MOD_ID,
             ModData::new,
@@ -43,6 +51,13 @@ public class ModData extends PersistentState {
             null
     );
 
+    /**
+     * Access pocket-contraptions data stored on the server
+     * @param server
+     * the server to get ModData from
+     * @return
+     * the ModData object with the saved values.
+     */
     public static ModData getModData(MinecraftServer server) {
         ServerWorld world = server.getWorld(World.OVERWORLD);
         Objects.requireNonNull(world);
@@ -51,12 +66,12 @@ public class ModData extends PersistentState {
         return modData;
     }
 
+    /**
+     * get the id that should be given to the next dimension created and increment it for next time.
+     * @return
+     * the id of the next pocket dimension
+     */
     public int getDimID() {
-        if (this.unreachableIDs.empty()) return nextDimID++;
-        else return this.unreachableIDs.pop();
-    }
-
-    public void addUnreachable(int unreachableID) {
-        this.unreachableIDs.push(unreachableID);
+        return nextDimID++;
     }
 }

@@ -1,13 +1,12 @@
 {
-	"required": true,
-	"package": "io.github.kameldaniel.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-	],
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"overwrites": {
-		"requireAnnotations": true
+  "required": true,
+  "package": "io.github.kameldaniel.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
 	}
 }

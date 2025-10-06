@@ -1,57 +1,72 @@
 package io.github.kameldaniel.world.dimension;
 
+import io.github.kameldaniel.ModData;
 import io.github.kameldaniel.PocketContraptions;
-import io.github.kameldaniel.block.ModBlocks;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.Difficulty;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.chunk.FlatChunkGenerator;
-import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import xyz.nucleoid.fantasy.Fantasy;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
-import xyz.nucleoid.fantasy.RuntimeWorldHandle;
+
+import java.util.Objects;
 
 public class PocketDimension {
-    public static final Logger LOGGER = LoggerFactory.getLogger(PocketContraptions.MOD_ID);
-
+    // Retrieve pocket dimension resources
     public static final RegistryKey<DimensionOptions> DIM = RegistryKey.of(RegistryKeys.DIMENSION,
             Identifier.of(PocketContraptions.MOD_ID, "pocket_dimension"));
     public static final RegistryKey<World> DIMENSION = RegistryKey.of(RegistryKeys.WORLD,
             Identifier.of(PocketContraptions.MOD_ID, DIM.getValue().getPath()));
     private static final RegistryKey<DimensionType> DIMENSION_TYPE = RegistryKey.of(RegistryKeys.DIMENSION_TYPE,
             Identifier.of(PocketContraptions.MOD_ID, "pocket_dimension_type"));
-    private static final RegistryKey<Biome> BIOME = RegistryKey.of(RegistryKeys.BIOME,
-            Identifier.of(PocketContraptions.MOD_ID, "pocket_dimension_biome"));
 
-    public static void initialize() {
+    /**
+     * Returns the RuntimeWorldHandle on MinecraftServer server with id pocket_dimension_[dimID].
+     * If the RuntimeWorldHandle does not yet exist, it is created and returned.
+     * @param server
+     * the MinecraftServer containing the dimension
+     * @param dimID
+     * the dimID of the pocket dimension (most likely from a QuantumCore)
+     * @return
+     * the RuntimeWorldHandle of the pocket dimension if it exists, or if it does not,
+     * creates a new on and returns it.
+     */
+    public static ServerWorld getDim(MinecraftServer server, int dimID) {
+        String dimName = "pocket_dimension_" + dimID;
+        Fantasy fantasy = Fantasy.get(server);
+        RuntimeWorldConfig config =  new RuntimeWorldConfig()
+                .setDimensionType(DIMENSION_TYPE)
+                .setMirrorOverworldDifficulty(true)
+                .setMirrorOverworldGameRules(true)
+                .setTimeOfDay(server.getOverworld().getTimeOfDay())
+                .setGenerator(Objects.requireNonNull(server.getWorld(DIMENSION)).getChunkManager().getChunkGenerator());
+        return fantasy.getOrOpenPersistentWorld(Identifier.of(PocketContraptions.MOD_ID, dimName), config).asWorld();
     }
 
-    public static ServerWorld createPocketDimension(MinecraftServer server, String dimID) {
-        Fantasy fantasy = Fantasy.get(server);
+    /**
+     * Creates a ServerWorld for a new pocket dimension, and returns its associated dimID.
+     * @param server
+     * the MinecraftServer to create the dimension in
+     * @return
+     * the dimID of the dimension. The dimension tag will be pocket_dimension_[dimID].
+     */
+    public static int createPocketDimension(MinecraftServer server) {
+        int dimID = ModData.getModData(server).getDimID();
+        PocketDimension.getDim(server, dimID);
+        return dimID;
+    }
 
-        RuntimeWorldConfig config = new RuntimeWorldConfig()
-                .setDimensionType(DIMENSION_TYPE)
-//                .setDifficulty(Difficulty.HARD)
-                .setGameRule(GameRules.DO_DAYLIGHT_CYCLE, true)
-                .setTimeOfDay(server.getOverworld().getTimeOfDay())
-                .setGenerator(server.getWorld(DIMENSION).getChunkManager().getChunkGenerator());
-//                .setSeed(server.getOverworld().getSeed());
-
-        RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(Identifier.of(PocketContraptions.MOD_ID, dimID), config);
-        ServerWorld world = worldHandle.asWorld();
-        world.setBlockState(BlockPos.ORIGIN.up(83), ModBlocks.COMPONENT_BLOCK.getDefaultState());
-        LOGGER.info("Origin: {}", BlockPos.ORIGIN);
-        return world;
+    public static void initialize() {
+        // This allows the player to spawn in a pocket dimension if they logged off in one
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            for (int dimID = 0; dimID < ModData.getModData(server).nextDimID; dimID++) {
+                PocketDimension.getDim(server, dimID);
+            }
+        });
     }
 }

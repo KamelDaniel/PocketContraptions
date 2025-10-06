@@ -8,41 +8,53 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.util.Identifier;
 
 import java.util.function.Function;
 
 public class ModBlocks {
-    public static final Block COMPONENT_BLOCK = register("component_block", Block::new, AbstractBlock.Settings.create(), true);
+    // Block Registration
+    public static final Block COMPONENT_BLOCK = register("component_block",
+            Block::new, AbstractBlock.Settings.create(), false);
+    public static final Block POCKET_CONTRAPTION = register("pocket_contraption",
+            Block::new, AbstractBlock.Settings.create(), true);
 
-    private static Block register(String name, Function<AbstractBlock.Settings, Block> blockFactory, AbstractBlock.Settings settings, boolean shouldRegisterItem) {
+    /**
+     * Creates and registers a Block with the given tag under the mod identifier.
+     * If shouldRegisterItem is true, an Item is also created and registered.
+     * The Block is created by calling blockConstructor(settings)
+     * @param name
+     * the block tag without mod id; mod id is applied automatically
+     * @param blockConstructor
+     * the method to create the Block
+     * @param settings
+     * block settings
+     * @param shouldRegisterItem
+     * true if a BlockItem should be created and registered for the block
+     * @return
+     * the Block created using blockConstructor
+     */
+    private static Block register(String name, Function<AbstractBlock.Settings, Block> blockConstructor, AbstractBlock.Settings settings, boolean shouldRegisterItem) {
         // Create a registry key for the block
-        RegistryKey<Block> blockKey = keyOfBlock(name);
+        RegistryKey<Block> blockKey = PocketContraptions.getBlockKey(name);
+
         // Create the block instance
-        Block block = blockFactory.apply(settings.registryKey(blockKey));
+        Block block = blockConstructor.apply(settings.registryKey(blockKey));
 
-        // Sometimes, you may not want to register an item for the block.
-        // Eg: if it's a technical block like `minecraft:moving_piston` or `minecraft:end_gateway`
         if (shouldRegisterItem) {
-            // Items need to be registered with a different type of registry key, but the ID
-            // can be the same.
-            RegistryKey<Item> itemKey = keyOfItem(name);
+            // Create a registry key for the item
+            RegistryKey<Item> itemKey = PocketContraptions.getItemKey(name);
 
-            BlockItem blockItem = new BlockItem(block, new Item.Settings().registryKey(itemKey));
+            // Create the item instance
+            BlockItem blockItem = new BlockItem(block, new Item.Settings().registryKey(itemKey).useBlockPrefixedTranslationKey());
+
+            // Register the item
             Registry.register(Registries.ITEM, itemKey, blockItem);
         }
 
-        return Registry.register(Registries.BLOCK, blockKey, block);
-    }
+        // Register the block
+        Registry.register(Registries.BLOCK, blockKey, block);
 
-    private static RegistryKey<Block> keyOfBlock(String name) {
-        return RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(PocketContraptions.MOD_ID, name));
-    }
-
-    private static RegistryKey<Item> keyOfItem(String name) {
-        return RegistryKey.of(RegistryKeys.ITEM, Identifier.of(PocketContraptions.MOD_ID, name));
+        return block;
     }
 
     public static void initialize() {}
