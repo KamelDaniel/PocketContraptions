@@ -1,5 +1,6 @@
 package io.github.kameldaniel;
 
+import io.github.kameldaniel.block.ModBlockEntities;
 import io.github.kameldaniel.block.ModBlocks;
 import io.github.kameldaniel.component.ModComponents;
 import io.github.kameldaniel.item.ModItems;
@@ -28,10 +29,12 @@ public class PocketContraptions implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+        // Initialize Mod Classes
         ModItems.initialize();
         ModBlocks.initialize();
         PocketDimension.initialize();
         ModComponents.initialize();
+        ModBlockEntities.initialize();
 		LOGGER.info("Mod Initialized! Hello Fabric World!");
 	}
 }

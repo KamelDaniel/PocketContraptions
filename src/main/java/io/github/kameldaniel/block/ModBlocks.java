@@ -1,6 +1,7 @@
 package io.github.kameldaniel.block;
 
 import io.github.kameldaniel.PocketContraptions;
+import io.github.kameldaniel.block.block.*;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
@@ -14,9 +15,9 @@ import java.util.function.Function;
 public class ModBlocks {
     // Block Registration
     public static final Block COMPONENT_BLOCK = register("component_block",
-            Block::new, AbstractBlock.Settings.create(), false);
-    public static final Block POCKET_CONTRAPTION = register("pocket_contraption",
-            Block::new, AbstractBlock.Settings.create(), true);
+            ComponentBlock::new, AbstractBlock.Settings.create().luminance(state -> 15), false);
+    public static final ContraptionBlock CONTRAPTION_BLOCK = (ContraptionBlock) register("contraption_block",
+        ContraptionBlock::new, AbstractBlock.Settings.create(), true);
 
     /**
      * Creates and registers a Block with the given tag under the mod identifier.
@@ -34,24 +35,24 @@ public class ModBlocks {
      * the Block created using blockConstructor
      */
     private static Block register(String name, Function<AbstractBlock.Settings, Block> blockConstructor, AbstractBlock.Settings settings, boolean shouldRegisterItem) {
-        // Create a registry key for the block
+        // Create a RegistryKey for the Block
         RegistryKey<Block> blockKey = PocketContraptions.getBlockKey(name);
 
-        // Create the block instance
+        // Create the Block instance
         Block block = blockConstructor.apply(settings.registryKey(blockKey));
 
         if (shouldRegisterItem) {
-            // Create a registry key for the item
+            // Create a RegistryKey for the Item
             RegistryKey<Item> itemKey = PocketContraptions.getItemKey(name);
 
-            // Create the item instance
+            // Create the Item instance
             BlockItem blockItem = new BlockItem(block, new Item.Settings().registryKey(itemKey).useBlockPrefixedTranslationKey());
 
-            // Register the item
+            // Register the Item
             Registry.register(Registries.ITEM, itemKey, blockItem);
         }
 
-        // Register the block
+        // Register the Block
         Registry.register(Registries.BLOCK, blockKey, block);
 
         return block;

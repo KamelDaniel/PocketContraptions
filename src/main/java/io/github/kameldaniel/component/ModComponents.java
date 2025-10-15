@@ -8,6 +8,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public class ModComponents {
+    // Register Components
     public static final ComponentType<Integer> DIM_KEY = Registry.register(
             Registries.DATA_COMPONENT_TYPE,
             Identifier.of(PocketContraptions.MOD_ID, "dim_id"),

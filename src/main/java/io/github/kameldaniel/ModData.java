@@ -61,9 +61,7 @@ public class ModData extends PersistentState {
     public static ModData getModData(MinecraftServer server) {
         ServerWorld world = server.getWorld(World.OVERWORLD);
         Objects.requireNonNull(world);
-        ModData modData = world.getPersistentStateManager().getOrCreate(ModData.type);
-        modData.markDirty();
-        return modData;
+        return world.getPersistentStateManager().getOrCreate(ModData.type);
     }
 
     /**
@@ -72,6 +70,7 @@ public class ModData extends PersistentState {
      * the id of the next pocket dimension
      */
     public int getDimID() {
+        super.markDirty();
         return nextDimID++;
     }
 }

@@ -42,13 +42,13 @@ public class ModItems {
      * the Item created using itemConstructor
      */
     public static Item register(String name, Function<Item.Settings, Item> itemConstructor, Item.Settings settings) {
-        // Create a registry key for the item
+        // Create a RegistryKey for the Item
         RegistryKey<Item> itemKey = PocketContraptions.getItemKey(name);
 
-        // Create the item instance
+        // Create the Item instance
         Item item = itemConstructor.apply(settings.registryKey(itemKey));
 
-        // Register the item
+        // Register the Item
         Registry.register(Registries.ITEM, itemKey, item);
 
         return item;
@@ -59,8 +59,7 @@ public class ModItems {
         Registry.register(Registries.ITEM_GROUP, CUSTOM_ITEM_GROUP_KEY, CUSTOM_ITEM_GROUP);
         ItemGroupEvents.modifyEntriesEvent(CUSTOM_ITEM_GROUP_KEY).register(itemGroup -> {
             itemGroup.add(ModItems.QUANTUM_CORE);
-            itemGroup.add(ModBlocks.POCKET_CONTRAPTION);
-            itemGroup.add(ModBlocks.COMPONENT_BLOCK);
+            itemGroup.add(ModBlocks.CONTRAPTION_BLOCK);
         });
     }
 }
