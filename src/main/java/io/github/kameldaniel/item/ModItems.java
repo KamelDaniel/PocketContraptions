@@ -1,7 +1,6 @@
 package io.github.kameldaniel.item;
 
 import io.github.kameldaniel.PocketContraptions;
-import io.github.kameldaniel.block.ModBlocks;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
@@ -12,8 +11,6 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Rarity;
-
 import java.util.function.Function;
 
 public class ModItems {
@@ -21,13 +18,12 @@ public class ModItems {
     public static final RegistryKey<ItemGroup> CUSTOM_ITEM_GROUP_KEY = RegistryKey.of(Registries.ITEM_GROUP.getKey(),
             Identifier.of(PocketContraptions.MOD_ID, "item_group"));
     public static final ItemGroup CUSTOM_ITEM_GROUP = FabricItemGroup.builder()
-            .icon(() -> new ItemStack(ModItems.QUANTUM_CORE))
+            .icon(() -> new ItemStack(Registries.ITEM.get(Identifier.ofVanilla("diamond_block"))))
             .displayName(Text.literal("Pocket Contraptions"))
             .build();
 
     // Item Registration
-    public static final Item QUANTUM_CORE = register("quantum_core", QuantumCore::new,
-            new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON));
+    public static final Item BLUEPRINT = register("blueprint", Item::new, new Item.Settings().maxCount(16));
 
     /**
      * Creates and registers an Item with the given tag under the mod identifier.
@@ -58,8 +54,7 @@ public class ModItems {
         // Register Item Group and add Items
         Registry.register(Registries.ITEM_GROUP, CUSTOM_ITEM_GROUP_KEY, CUSTOM_ITEM_GROUP);
         ItemGroupEvents.modifyEntriesEvent(CUSTOM_ITEM_GROUP_KEY).register(itemGroup -> {
-            itemGroup.add(ModItems.QUANTUM_CORE);
-            itemGroup.add(ModBlocks.CONTRAPTION_BLOCK);
+            itemGroup.add(ModItems.BLUEPRINT);
         });
     }
 }

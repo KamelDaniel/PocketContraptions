@@ -1,8 +1,6 @@
 package io.github.kameldaniel.block;
 
 import io.github.kameldaniel.PocketContraptions;
-import io.github.kameldaniel.block.entity.ComponentBlockEntity;
-import io.github.kameldaniel.block.entity.ContraptionBlockEntity;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
@@ -13,10 +11,6 @@ import net.minecraft.util.Identifier;
 
 public class ModBlockEntities {
     // BlockEntity Registration
-    public static final BlockEntityType<ComponentBlockEntity> COMPONENT_BLOCK =
-            register("component_block", ComponentBlockEntity::new, ModBlocks.COMPONENT_BLOCK);
-    public static final BlockEntityType<ContraptionBlockEntity> CONTRAPTION_BLOCK =
-            register("pocket_contraption", ContraptionBlockEntity::new, ModBlocks.CONTRAPTION_BLOCK);
 
     /**
      * Creates and registers a BlockEntityType with the given tag under the mod identifier

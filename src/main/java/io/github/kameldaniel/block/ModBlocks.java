@@ -14,10 +14,6 @@ import java.util.function.Function;
 
 public class ModBlocks {
     // Block Registration
-    public static final Block COMPONENT_BLOCK = register("component_block",
-            ComponentBlock::new, AbstractBlock.Settings.create().luminance(state -> 15), false);
-    public static final ContraptionBlock CONTRAPTION_BLOCK = (ContraptionBlock) register("contraption_block",
-        ContraptionBlock::new, AbstractBlock.Settings.create(), true);
 
     /**
      * Creates and registers a Block with the given tag under the mod identifier.

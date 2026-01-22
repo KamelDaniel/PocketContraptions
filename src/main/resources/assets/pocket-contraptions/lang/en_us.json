@@ -1,7 +1,3 @@
 {
-  "item.pocket-contraptions.quantum_core": "Quantum Core",
-  "block.pocket-contraptions.component_block": "Component Block",
-  "block.pocket-contraptions.contraption_block": "Pocket Contraption",
-  "item.pocket-contraptions.contraption_block": "Pocket Contraption",
-  "item.pocket-contraptions.dim_id": "Attached Pocket Dimension: %1$s"
+  "item.pocket-contraptions.blueprint": "Blueprint"
 }

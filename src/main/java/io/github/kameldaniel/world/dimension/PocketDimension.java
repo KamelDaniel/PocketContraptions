@@ -2,7 +2,6 @@ package io.github.kameldaniel.world.dimension;
 
 import io.github.kameldaniel.ModData;
 import io.github.kameldaniel.PocketContraptions;
-import io.github.kameldaniel.block.ModBlocks;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -96,11 +95,7 @@ public class PocketDimension {
      * the dimID of the dimension. The dimension tag will be pocket_dimension_[dimID].
      */
     public static int createPocketDimension(MinecraftServer server) {
-        int dimID = ModData.getModData(server).getDimID();
-        ServerWorld dim = PocketDimension.getDim(server, dimID);
-        buildCube(dim, BlockPos.ORIGIN.up(64).south(8).west(9),
-                ModBlocks.COMPONENT_BLOCK.getDefaultState(), 16);
-        return dimID;
+        return ModData.getModData(server).getDimID();
     }
 
     /**
