@@ -1,3 +1,7 @@
 {
-  "item.pocket-contraptions.blueprint": "Blueprint"
+  "block.pocket-contraptions.blueprint_builder": "Blueprint Builder",
+  "container.pocket-contraptions.blueprint_builder": "Blueprint Builder",
+  "item.pocket-contraptions.blueprint_builder": "Blueprint Builder",
+  "item.pocket-contraptions.blueprint": "Blueprint",
+  "item.pocket-contraptions.blueprint_recipe_result": "%1$s Blueprint"
 }

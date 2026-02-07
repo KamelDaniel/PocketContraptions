@@ -1,6 +1,7 @@
 package io.github.kameldaniel.block;
 
 import io.github.kameldaniel.PocketContraptions;
+import io.github.kameldaniel.block.entity.BlueprintBuilderEntity;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
@@ -11,6 +12,8 @@ import net.minecraft.util.Identifier;
 
 public class ModBlockEntities {
     // BlockEntity Registration
+    public static final BlockEntityType<BlueprintBuilderEntity> BLUEPRINT_BUILDER =
+            register("blueprint_builder_entity", BlueprintBuilderEntity::new, ModBlocks.BLUEPRINT_BUILDER);
 
     /**
      * Creates and registers a BlockEntityType with the given tag under the mod identifier
@@ -29,7 +32,7 @@ public class ModBlockEntities {
             Block... blocks
     ) {
         // Create a tag
-        Identifier id = Identifier.of(PocketContraptions.MOD_ID, name);
+        Identifier id = PocketContraptions.id(name);
         // Create the BlockEntityType
         BlockEntityType<T> blockEntityType = FabricBlockEntityTypeBuilder.<T>create(blockEntityConstructor, blocks).build();
         // Return and register the BlockEntityType
