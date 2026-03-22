@@ -58,6 +58,7 @@ public class ModItems {
         ItemGroupEvents.modifyEntriesEvent(CUSTOM_ITEM_GROUP_KEY).register(itemGroup -> {
             itemGroup.add(ModItems.BLUEPRINT);
             itemGroup.add(ModBlocks.BLUEPRINT_BUILDER.asItem());
+            itemGroup.add(ModBlocks.POCKET_CONTRAPTION.asItem());
         });
     }
 }

@@ -33,7 +33,7 @@ public class BlueprintBuilderIngredientsWidget extends ScrollableWidget {
     }
 
     public BlueprintBuilderIngredientsWidget(int x, int y, BlueprintBuilderScreenHandler handler, TextRenderer textRenderer) {
-        super(x+177, y+10, 70, 147, Text.empty());
+        super(x+175, y+19, 73, 140, Text.empty());
         this.TEXT_RENDERER = textRenderer;
         this.BLUEPRINT_SLOT = handler.getSlot(1);
     }

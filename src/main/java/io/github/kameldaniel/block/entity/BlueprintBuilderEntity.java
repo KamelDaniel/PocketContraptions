@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.FacingBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -38,11 +39,16 @@ import static net.minecraft.world.RedstoneView.DIRECTIONS;
 
 public class BlueprintBuilderEntity extends BlockEntity implements ExtendedScreenHandlerFactory<BlockPosPayload>, SidedInventory {
     private ItemStack base = ItemStack.EMPTY;
+    private final int BASE_SLOT = 0;
     private ItemStack blueprint = ItemStack.EMPTY;
+    private final int BLUEPRINT_SLOT = 1;
     private ItemStack output = ItemStack.EMPTY;
+    private final int OUTPUT_SLOT = 2;
+    private final Direction FACING;
 
     public BlueprintBuilderEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.BLUEPRINT_BUILDER, pos, state);
+        this.FACING = state.get(FacingBlock.FACING);
     }
 
     public void attemptCraft() {
@@ -57,6 +63,7 @@ public class BlueprintBuilderEntity extends BlockEntity implements ExtendedScree
                 int required = reqInit;
                 int available = 0;
                 for (Direction dir : DIRECTIONS) {
+                    if (dir.equals(this.FACING)) continue;
                     Storage<ItemVariant> storage = ItemStorage.SIDED.find(world, pos.offset(dir), dir.getOpposite());
                     if (storage == null) continue;
                     for (StorageView<ItemVariant> view : storage) {
@@ -84,8 +91,8 @@ public class BlueprintBuilderEntity extends BlockEntity implements ExtendedScree
                             (Registries.ITEM.getId(this.output.getItem()).equals(result)) &&
                                     this.output.getCount() < this.output.getMaxCount())) {
                 transaction.commit();
-                this.removeStack(0);
-                this.setStack(2, new ItemStack(Registries.ITEM.get(result), this.output.getCount() + 1));
+                this.removeStack(BLUEPRINT_SLOT);
+                this.setStack(OUTPUT_SLOT, new ItemStack(Registries.ITEM.get(result), this.output.getCount() + 1));
                 this.attemptCraft();
             } else {
                 newBlueprint.set(ModComponents.REQUIRED_ITEMS, requiredItems);
@@ -97,7 +104,7 @@ public class BlueprintBuilderEntity extends BlockEntity implements ExtendedScree
 
     @Override
     public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        this.setStack(1, this.removeStack(1));
+        this.setStack(BLUEPRINT_SLOT, this.removeStack(BLUEPRINT_SLOT));
         super.onBlockReplaced(pos, oldState);
     }
 
@@ -114,9 +121,9 @@ public class BlueprintBuilderEntity extends BlockEntity implements ExtendedScree
     protected void readData(ReadView view) {
         DefaultedList<ItemStack> items = DefaultedList.ofSize(3, ItemStack.EMPTY);
         Inventories.readData(view, items);
-        this.base = items.get(0);
-        this.blueprint = items.get(1);
-        this.output = items.get(2);
+        this.base = items.get(BASE_SLOT);
+        this.blueprint = items.get(BLUEPRINT_SLOT);
+        this.output = items.get(OUTPUT_SLOT);
     }
 
     @Override
@@ -136,19 +143,19 @@ public class BlueprintBuilderEntity extends BlockEntity implements ExtendedScree
 
     @Override
     public int[] getAvailableSlots(Direction side) {
-        return new int[]{0, 1, 2};
+        return new int[]{BASE_SLOT, BLUEPRINT_SLOT, OUTPUT_SLOT};
     }
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return (slot == 0 && this.base.isEmpty() && !this.blueprint.isEmpty()
+        return (slot == BASE_SLOT && this.base.isEmpty() && !this.blueprint.isEmpty()
                 && this.blueprint.get(ModComponents.BLUEPRINT).base().equals(Registries.ITEM.getId(stack.getItem())))
-                || (slot == 1 && this.blueprint.isEmpty() && stack.contains(ModComponents.BLUEPRINT));
+                || (slot == BLUEPRINT_SLOT && this.blueprint.isEmpty() && stack.contains(ModComponents.BLUEPRINT));
     }
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return slot == 2;
+        return slot == OUTPUT_SLOT;
     }
 
     @Override
@@ -163,9 +170,9 @@ public class BlueprintBuilderEntity extends BlockEntity implements ExtendedScree
 
     @Override
     public ItemStack getStack(int slot) {
-        if (slot == 0) return this.base;
-        if (slot == 1) return this.blueprint;
-        if (slot == 2) return this.output;
+        if (slot == BASE_SLOT) return this.base;
+        if (slot == BLUEPRINT_SLOT) return this.blueprint;
+        if (slot == OUTPUT_SLOT) return this.output;
         return ItemStack.EMPTY;
     }
 
@@ -177,17 +184,17 @@ public class BlueprintBuilderEntity extends BlockEntity implements ExtendedScree
     @Override
     public ItemStack removeStack(int slot) {
         ItemStack out = ItemStack.EMPTY;
-        if (slot == 0) {
+        if (slot == BASE_SLOT) {
             out = this.base;
             this.base = ItemStack.EMPTY;
             super.markDirty();
-        } else if (slot == 1) {
+        } else if (slot == BLUEPRINT_SLOT) {
             out = this.blueprint;
             this.blueprint = ItemStack.EMPTY;
             out.remove(ModComponents.REQUIRED_ITEMS);
             out.remove(ModComponents.AVAILABLE_ITEMS);
             super.markDirty();
-        } else if (slot == 2) {
+        } else if (slot == OUTPUT_SLOT) {
             out = this.output;
             this.output = ItemStack.EMPTY;
             super.markDirty();
@@ -197,17 +204,17 @@ public class BlueprintBuilderEntity extends BlockEntity implements ExtendedScree
 
     @Override
     public void setStack(int slot, ItemStack stack) {
-        if (slot == 0) {
+        if (slot == BASE_SLOT) {
             this.base = stack;
             super.markDirty();
-        } else if (slot == 1 && stack.contains(ModComponents.BLUEPRINT)) {
+        } else if (slot == BLUEPRINT_SLOT && stack.contains(ModComponents.BLUEPRINT)) {
             if (!stack.contains(ModComponents.REQUIRED_ITEMS))
                 stack.set(ModComponents.REQUIRED_ITEMS, new HashMap<>(stack.get(ModComponents.BLUEPRINT).ingredients()));
             if (!stack.contains(ModComponents.AVAILABLE_ITEMS))
                 stack.set(ModComponents.AVAILABLE_ITEMS, new HashMap<>());
             this.blueprint = stack;
             super.markDirty();
-        } else if (slot == 2) {
+        } else if (slot == OUTPUT_SLOT) {
             this.output = stack;
             super.markDirty();
         }

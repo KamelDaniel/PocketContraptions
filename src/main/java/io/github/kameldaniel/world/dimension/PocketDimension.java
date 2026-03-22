@@ -36,18 +36,18 @@ public class PocketDimension {
             Identifier.of(PocketContraptions.MOD_ID, "pocket_dimension_type"));
 
     /**
-     * Returns the RuntimeWorldHandle on MinecraftServer server with id pocket_dimension_[dimID].
+     * Returns the RuntimeWorldHandle on MinecraftServer server with id pocket_dimension_[dimKey].
      * If the RuntimeWorldHandle does not yet exist, it is created and returned.
      * @param server
      * the MinecraftServer containing the dimension
      * @param dimID
-     * the dimID of the pocket dimension (most likely from a QuantumCore)
+     * the dimKey of the pocket dimension (most likely from a QuantumCore)
      * @return
      * the RuntimeWorldHandle of the pocket dimension if it exists, or if it does not,
      * creates a new on and returns it.
      */
     public static ServerWorld getDim(MinecraftServer server, int dimID) {
-        if (dimID < 0) throw new IllegalArgumentException("dimID must be non-negative");
+        if (dimID < 0) throw new IllegalArgumentException("dimKey must be non-negative");
         String dimName = "pocket_dimension_" + dimID;
         Fantasy fantasy = Fantasy.get(server);
         RuntimeWorldConfig config =  new RuntimeWorldConfig()
@@ -87,19 +87,19 @@ public class PocketDimension {
     }
 
     /**
-     * Creates a ServerWorld for a new pocket dimension, and returns its associated dimID.
+     * Creates a ServerWorld for a new pocket dimension, and returns its associated dimKey.
      * Makes a hollow box of Component Blocks with a floor centered around 0 64 0.
      * @param server
      * the MinecraftServer to create the dimension in
      * @return
-     * the dimID of the dimension. The dimension tag will be pocket_dimension_[dimID].
+     * the dimKey of the dimension. The dimension tag will be pocket_dimension_[dimKey].
      */
     public static int createPocketDimension(MinecraftServer server) {
         return ModData.getModData(server).getDimID();
     }
 
     /**
-     * Teleports entity to 0 66 0 in pocket_dimension_[dimID]
+     * Teleports entity to 0 66 0 in pocket_dimension_[dimKey]
      * @param entity
      * the entity to teleport
      * @param dimID

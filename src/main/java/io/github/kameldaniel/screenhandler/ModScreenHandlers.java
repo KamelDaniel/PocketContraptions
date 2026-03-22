@@ -16,9 +16,12 @@ public class ModScreenHandlers {
             register("blueprint_builder_screen_handler", BlueprintBuilderScreenHandler::new, BlockPosPayload.PACKET_CODEC);
 
     public static <T extends ScreenHandler, U extends CustomPayload> ExtendedScreenHandlerType<T, U>
-        register(String name, ExtendedScreenHandlerType.ExtendedFactory<T, U> screenHandlerConstructor,
+        register(String name,
+                 ExtendedScreenHandlerType.ExtendedFactory<T, U> screenHandlerConstructor,
                  PacketCodec<? super RegistryByteBuf, U> codec) {
-        return Registry.register(Registries.SCREEN_HANDLER, PocketContraptions.id(name), new ExtendedScreenHandlerType<>(screenHandlerConstructor, codec));
+        return Registry.register(Registries.SCREEN_HANDLER,
+                PocketContraptions.id(name),
+                new ExtendedScreenHandlerType<>(screenHandlerConstructor, codec));
     }
 
     public static void initialize() {}

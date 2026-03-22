@@ -6,6 +6,7 @@ import io.github.kameldaniel.block.ModBlocks;
 import io.github.kameldaniel.component.BlueprintBuilderRecipe;
 import io.github.kameldaniel.component.ModComponents;
 import io.github.kameldaniel.item.ModItems;
+import io.github.kameldaniel.payload.ModPayloads;
 import io.github.kameldaniel.screenhandler.ModScreenHandlers;
 import io.github.kameldaniel.world.dimension.PocketDimension;
 import net.fabricmc.api.ModInitializer;
@@ -42,7 +43,10 @@ public class PocketContraptions implements ModInitializer {
         ModComponents.initialize();
         ModBlockEntities.initialize();
         ModScreenHandlers.initialize();
+        ModPayloads.init();
+//        EventRegistrar.init();
 		LOGGER.info("Mod Initialized! Hello Fabric World!");
+
         CommandRegistrationCallback.EVENT.register(((commandDispatcher, commandRegistryAccess, registrationEnvironment) -> {
             commandDispatcher.register(CommandManager.literal("makeblueprint")
                     .then(CommandManager.argument("base", ItemStackArgumentType.itemStack(commandRegistryAccess))

@@ -30,7 +30,7 @@ public class BlueprintBuilderScreenHandler extends ScreenHandler {
         this.CONTEXT = ScreenHandlerContext.create(entity.getWorld(), entity.getPos());
 
         // Base Slot:
-        Slot baseSlot = new Slot(this.ENTITY, 0, 44, 30) {
+        Slot baseSlot = new Slot(this.ENTITY, 0, 62, 43) {
             @Override
             public boolean canInsert(ItemStack stack) {
                 ItemStack blueprint = getSlot(1).getStack();
@@ -45,7 +45,7 @@ public class BlueprintBuilderScreenHandler extends ScreenHandler {
         };
 
         // Blueprint Slot:
-        Slot blueprintSlot = new Slot(this.ENTITY, 1, 80, 55) {
+        Slot blueprintSlot = new Slot(this.ENTITY, 1, 44, 43) {
             @Override
             public boolean canInsert(ItemStack stack) {
                 return super.canInsert(stack) && stack.getComponents().contains(ModComponents.BLUEPRINT);
@@ -70,7 +70,7 @@ public class BlueprintBuilderScreenHandler extends ScreenHandler {
         };
 
         // Output Slot:
-        Slot outputSlot = new Slot(this.ENTITY, 2, 119, 30) {
+        Slot outputSlot = new Slot(this.ENTITY, 2, 116, 43) {
             @Override
             public boolean canInsert(ItemStack stack) {
                 return false;
@@ -81,7 +81,7 @@ public class BlueprintBuilderScreenHandler extends ScreenHandler {
         addSlot(blueprintSlot);
         addSlot(outputSlot);
 
-        super.addPlayerHotbarSlots(playerInventory, 8, 142);
+        super.addPlayerHotbarSlots(playerInventory, 8, 143);
         super.addPlayerInventorySlots(playerInventory, 8, 84);
     }
 
