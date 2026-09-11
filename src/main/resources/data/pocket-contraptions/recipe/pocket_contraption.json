@@ -1,0 +1,13 @@
+{
+  "type": "pocket-contraptions:blueprint_building",
+  "id": "pocket-contraptions:pocket_contraption",
+  "blueprint": "pocket-contraptions:blueprint",
+  "base": "minecraft:ender_pearl",
+  "result": {
+    "id": "pocket-contraptions:pocket_contraption",
+    "count": 1
+  },
+  "ingredients": [
+    {"ingredient": "#minecraft:wool"}
+  ]
+}

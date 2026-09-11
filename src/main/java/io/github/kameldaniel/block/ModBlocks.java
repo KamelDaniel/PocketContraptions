@@ -2,6 +2,7 @@ package io.github.kameldaniel.block;
 
 import io.github.kameldaniel.PocketContraptions;
 import io.github.kameldaniel.block.block.BlueprintBuilder;
+import io.github.kameldaniel.block.block.BlueprintBuildingTable;
 import io.github.kameldaniel.block.block.PocketContraption;
 import io.github.kameldaniel.item.PocketContraptionItem;
 import net.minecraft.block.AbstractBlock;
@@ -20,6 +21,8 @@ public class ModBlocks {
     // Block Registration
     public static final Block BLUEPRINT_BUILDER = register("blueprint_builder",
             BlueprintBuilder::new, BlockItem::new);
+    public static final Block BLUEPRINT_BUILDING_TABLE = register("blueprint_building_table",
+            BlueprintBuildingTable::new, BlockItem::new);
     public static final Block POCKET_CONTRAPTION = register("pocket_contraption",
             PocketContraption::new, PocketContraptionItem::new);
 

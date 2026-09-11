@@ -1,17 +1,17 @@
 package io.github.kameldaniel.screen;
 
 import io.github.kameldaniel.PocketContraptions;
-import io.github.kameldaniel.screenhandler.BlueprintBuilderScreenHandler;
-import net.minecraft.client.MinecraftClient;
+import io.github.kameldaniel.component.ModComponents;
+import io.github.kameldaniel.recipe.type.BlueprintBuilding;
+import io.github.kameldaniel.screenhandler.BlueprintBuildingTableScreenHandler;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 
-public class BlueprintBuilderScreen extends HandledScreen<BlueprintBuilderScreenHandler> {
-    public BlueprintBuilderScreen(BlueprintBuilderScreenHandler handler, PlayerInventory inventory, Text title) {
+public class BlueprintBuildingTableScreen extends AbstractBlueprintBuildingScreen<BlueprintBuildingTableScreenHandler> {
+    public BlueprintBuildingTableScreen(BlueprintBuildingTableScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
         super.backgroundWidth = 255;
         super.backgroundHeight = 165;
@@ -20,7 +20,12 @@ public class BlueprintBuilderScreen extends HandledScreen<BlueprintBuilderScreen
     @Override
     protected void init() {
         super.init();
-        addDrawableChild(new BlueprintBuilderIngredientsWidget(super.x, super.y, super.handler, super.textRenderer));
+        addDrawableChild(new BlueprintBuildingChecklistWidget(super.x + 175, super.y + 19, 73, 140, this, super.textRenderer));
+    }
+
+    @Override
+    BlueprintBuilding.Checklist getChecklist() {
+        return super.handler.getBlueprint().getOrDefault(ModComponents.BLUEPRINT_CHECKLIST, null);
     }
 
     @Override
@@ -32,12 +37,6 @@ public class BlueprintBuilderScreen extends HandledScreen<BlueprintBuilderScreen
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
         super.render(context, mouseX, mouseY, deltaTicks);
-//        ItemStack blueprint = super.getScreenHandler().getSlot(1).getStack();
-//        if (blueprint.isEmpty()) return;
-//        context.drawItem(new ItemStack(Registries.ITEM.get(blueprint.get(ModComponents.BLUEPRINT).base())),
-//                super.x + 44, super.y + 52);
-//        context.drawItem(new ItemStack(Registries.ITEM.get(blueprint.get(ModComponents.BLUEPRINT).result())),
-//                super.x + 119, super.y + 52);
     }
 
     @Override

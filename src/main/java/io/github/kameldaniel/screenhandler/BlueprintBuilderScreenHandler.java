@@ -2,12 +2,10 @@ package io.github.kameldaniel.screenhandler;
 
 import io.github.kameldaniel.block.ModBlocks;
 import io.github.kameldaniel.block.entity.BlueprintBuilderEntity;
-import io.github.kameldaniel.component.ModComponents;
 import io.github.kameldaniel.payload.BlockPosPayload;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
@@ -33,9 +31,10 @@ public class BlueprintBuilderScreenHandler extends ScreenHandler {
         Slot baseSlot = new Slot(this.ENTITY, 0, 62, 43) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                ItemStack blueprint = getSlot(1).getStack();
-                return super.canInsert(stack) && !blueprint.isEmpty() &&
-                        blueprint.get(ModComponents.BLUEPRINT).base().equals(Registries.ITEM.getId(stack.getItem()));
+                return true;
+//                ItemStack blueprint = getSlot(1).getStack();
+//                return super.canInsert(stack) && !blueprint.isEmpty() &&
+//                        blueprint.get(ModComponents.BLUEPRINT).base().equals(Registries.ITEM.getId(stack.getItem()));
             }
 
             @Override
@@ -48,7 +47,8 @@ public class BlueprintBuilderScreenHandler extends ScreenHandler {
         Slot blueprintSlot = new Slot(this.ENTITY, 1, 44, 43) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return super.canInsert(stack) && stack.getComponents().contains(ModComponents.BLUEPRINT);
+                return true;
+//                return super.canInsert(stack) && stack.getComponents().contains(ModComponents.BLUEPRINT);
             }
 
             @Override
