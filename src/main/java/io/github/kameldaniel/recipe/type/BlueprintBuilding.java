@@ -11,8 +11,6 @@ import io.github.kameldaniel.recipe.input.BlueprintBuildingInput;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.item.AirBlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.RegistryByteBuf;
@@ -22,12 +20,9 @@ import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class BlueprintBuilding implements Recipe<BlueprintBuildingInput> {
     private static final List<Identifier> ids = new ArrayList<>();
@@ -81,8 +76,19 @@ public class BlueprintBuilding implements Recipe<BlueprintBuildingInput> {
         return IngredientPlacement.forSingleSlot(this.base);
     }
 
-    // the transaction should be aborted or committed by the caller
-    public Checklist getChecklist(Transaction transaction, BlueprintBuildingInput input) {
+    /**
+     * Uses transaction to extract all ingredients required for the BlueprintBuilding recipe.
+     * It is the responsibility of the user to commit or abort the transaction
+     * @param plan
+     * The ExtractionPlan used to extract the ingredients; will be cleared first
+     * @param input
+     * Calls getAvailableInventories and checks returns inventories for ingredients
+     * @return
+     * The Checklist tracking the ingredients extracted by the transaction
+     * and the ingredients that are missing from the available inventories.
+     */
+    public Checklist getChecklist(BlueprintBuildingInput.ExtractionPlan plan, BlueprintBuildingInput input) {
+        plan.clear();
         ArrayList<CountedIngredient> required = new ArrayList<>();
         ArrayList<CountedIngredient> available = new ArrayList<>();
         for (CountedIngredient ingredient : List.copyOf(this.ingredients)) {
@@ -91,9 +97,10 @@ public class BlueprintBuilding implements Recipe<BlueprintBuildingInput> {
             for (Storage<ItemVariant> inventory : input.getAvailableInventories()) {
                 for (StorageView<ItemVariant> view : inventory) {
                     if (requiredCI.getIngredient().test(view.getResource().toStack())) {
-                        int count = (int) inventory.extract(view.getResource(), requiredCI.getCount(), transaction);
+                        int count = Math.min((int) view.getAmount(), requiredCI.count);
                         requiredCI.count -= count;
                         availableCI.count += count;
+                        plan.add(view, count);
                         if (requiredCI.count == 0) break;
                     }
                 }
@@ -117,10 +124,6 @@ public class BlueprintBuilding implements Recipe<BlueprintBuildingInput> {
                         CountedIngredient.CODEC.listOf().optionalFieldOf("available", List.of()).forGetter(Checklist::available)
                 ).apply(instance, Checklist::new)
         );
-
-        public static Checklist fromRequired(List<CountedIngredient> required) {
-            return new Checklist(List.copyOf(required), required.stream().map(ci -> new CountedIngredient(ci.ingredient)).toList());
-        }
 
         public boolean isComplete() {
             return this.required.isEmpty();

@@ -1,12 +1,6 @@
 package io.github.kameldaniel.screenhandler;
 
-import io.github.kameldaniel.PocketContraptions;
-import io.github.kameldaniel.block.block.PocketContraption;
-import io.github.kameldaniel.component.ModComponents;
-import io.github.kameldaniel.recipe.ModRecipes;
-import io.github.kameldaniel.recipe.input.BlueprintBuildingInput;
-import io.github.kameldaniel.recipe.type.BlueprintBuilding;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -17,21 +11,55 @@ import net.minecraft.screen.*;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.world.ServerWorld;
 
-import java.util.Optional;
-
+@SuppressWarnings({"UnusedReturnValue", "SameParameterValue"})
 public abstract class AbstractBlueprintBuildingScreenHandler extends AbstractRecipeScreenHandler {
 
+    /**
+     * A screen handler for Blueprint Building recipes
+     * @param screenHandlerType
+     * The ScreenHandlerType of the child
+     * @param syncId
+     * The syncId for Client-Server synchronization
+     */
     protected AbstractBlueprintBuildingScreenHandler(
             ScreenHandlerType<? extends AbstractBlueprintBuildingScreenHandler> screenHandlerType,
             int syncId) {
         super(screenHandlerType, syncId);
-
     }
 
+    /**
+     * Creates the blueprint Slot for the Screen Handler
+     * - Slot views the blueprint used in the Blueprint Building recipe
+     * @param inventory
+     * The inventory containing the blueprint ItemStack
+     * @param x
+     * x coordinate to draw the Slot on the inventory texture
+     * @param y
+     * y coordinate to draw the Slot on the inventory texture
+     * @return
+     * The Slot that views the blueprint; Has max item count 1
+     */
     protected Slot addBlueprintSlot(Inventory inventory, int x, int y) {
-        return this.addSlot(new Slot(inventory, SlotIndex.BLUEPRINT.index(), x, y));
+        return this.addSlot(new Slot(inventory, SlotIndex.BLUEPRINT.index(), x, y) {
+            @Override
+            public int getMaxItemCount() {
+                return 1;
+            }
+        });
     }
 
+    /**
+     * Creates the base Slot for the Screen Handler
+     * - Slot views the base used in the Blueprint Building recipe
+     * @param inventory
+     * The inventory containing the base ItemStack
+     * @param x
+     * x coordinate to draw the Slot on the inventory texture
+     * @param y
+     * y coordinate to draw the Slot on the inventory texture
+     * @return
+     * The Slot that views the base; Has max item count 1
+     */
     protected Slot addBaseSlot(Inventory inventory, int x, int y) {
         return this.addSlot(new Slot(inventory, SlotIndex.BASE.index(), x, y) {
             @Override
@@ -41,6 +69,18 @@ public abstract class AbstractBlueprintBuildingScreenHandler extends AbstractRec
         });
     }
 
+    /**
+     * Creates the result Slot for the Screen Handler
+     * - Slot views the output of the Blueprint Builder
+     * @param inventory
+     * The inventory containing the result ItemStack
+     * @param x
+     * x coordinate to draw the Slot on the inventory texture
+     * @param y
+     * y coordinate to draw the Slot on the inventory texture
+     * @return
+     * The Slot that views the result; Cannot insert
+     */
     protected Slot addResultSlot(Inventory inventory, int x, int y) {
         return this.addSlot(new Slot(inventory, SlotIndex.RESULT.index(), x, y) {
             @Override
@@ -49,56 +89,28 @@ public abstract class AbstractBlueprintBuildingScreenHandler extends AbstractRec
             }
 
             @Override
-            public ItemStack getStack() {
-                ItemStack result = super.getStack();
-//                PocketContraptions.LOGGER.info("Got ResultSlot: {}", result);
-                return result;
+            public boolean canTakeItems(PlayerEntity playerEntity) {
+                return canTakeResult();
+            }
+
+            @Override
+            public ItemStack takeStack(int amount) {
+                ItemStack stack = super.takeStack(amount);
+                if (!stack.isEmpty()) {
+                    onResultTaken();
+                }
+                return stack;
+            }
+
+            @Override
+            public void markDirty() {
             }
         });
     }
 
-    public static ItemStack updateRecipe(ServerWorld world, BlueprintBuildingInput input) {
-        PocketContraptions.LOGGER.info("updateRecipe called.");
-        if (input.getBlueprint().isEmpty()) {
-            PocketContraptions.LOGGER.info("No blueprint, removing checklist");
-            input.setChecklist(null);
-            return ItemStack.EMPTY;
-        }
-        BlueprintBuilding recipe = getMatchingRecipe(world, input);
-        if (recipe == null) {
-            PocketContraptions.LOGGER.info("No matching recipe, removing checklist");
-            input.setChecklist(null);
-            return ItemStack.EMPTY;
-        }
-        // Found a matching recipe
-        try (Transaction transaction = Transaction.openOuter()) {
-            PocketContraptions.LOGGER.info("Recipe found! Checking Ingredients");
-            BlueprintBuilding.Checklist checklist = recipe.getChecklist(transaction, input);
-            input.setChecklist(checklist);
-            if (checklist.isComplete()) {
-                PocketContraptions.LOGGER.info("All ingredients present, checking base");
-                if (recipe.testBase(input.getBase())) {
-                    PocketContraptions.LOGGER.info("Base Matches, crafting");
-                    transaction.commit();
-                    ItemStack result = recipe.craft(input, world.getRegistryManager());
-                    return result;
-                } else {
-                    PocketContraptions.LOGGER.info("Base Mismatch, returning");
-                    return ItemStack.EMPTY;
-                }
-            } else {
-                PocketContraptions.LOGGER.info("Not all ingredients present, returning");
-                return ItemStack.EMPTY;
-            }
-        }
-    }
+    protected abstract boolean canTakeResult();
 
-    private static BlueprintBuilding getMatchingRecipe(ServerWorld world, BlueprintBuildingInput input) {
-        if (input.getBlueprint().isEmpty()) return null;
-        if (input.getBlueprint().contains(ModComponents.BLUEPRINT_RECIPE)) input.getBlueprint().get(ModComponents.BLUEPRINT_RECIPE);
-        Optional<RecipeEntry<BlueprintBuilding>> entry = world.getRecipeManager().getFirstMatch(ModRecipes.BLUEPRINT_BUILDING, input, world);
-        return entry.map(RecipeEntry::value).orElse(null);
-    }
+    protected abstract void onResultTaken();
 
     @Override
     public PostFillAction fillInputSlots(boolean craftAll, boolean creative, RecipeEntry<?> recipeEntry, ServerWorld world, PlayerInventory inventory) {

@@ -2,7 +2,6 @@ package io.github.kameldaniel.screenhandler;
 
 import io.github.kameldaniel.PocketContraptions;
 import io.github.kameldaniel.block.ModBlocks;
-import io.github.kameldaniel.block.block.PocketContraption;
 import io.github.kameldaniel.component.ModComponents;
 import io.github.kameldaniel.recipe.input.BlueprintBuildingInput;
 import io.github.kameldaniel.recipe.type.BlueprintBuilding;
@@ -15,7 +14,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.book.RecipeBookType;
 import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.world.ServerWorld;
 
 import java.util.List;
@@ -23,18 +21,34 @@ import java.util.List;
 public class BlueprintBuildingTableScreenHandler extends AbstractBlueprintBuildingScreenHandler implements BlueprintBuildingInput {
     private final ScreenHandlerContext context;
     private final PlayerInventory playerInventory;
+    private final BlueprintBuildingInput.ExtractionPlan plan = new BlueprintBuildingInput.ExtractionPlan();
 
     private ItemStack blueprint = ItemStack.EMPTY;
     private ItemStack base = ItemStack.EMPTY;
     private ItemStack result = ItemStack.EMPTY;
 
 
-    // Client Constructor
+    /**
+     * Client Constructor
+     * - Creates a BlueprintBuildingTableScreenHandler with empty context
+     * @param syncId
+     * The syncId for Client-Server Synchronization
+     * @param playerInventory
+     * The PlayerInventory of the PlayerEntity that opened the ScreenHandler
+     */
     public BlueprintBuildingTableScreenHandler(int syncId, PlayerInventory playerInventory) {
         this(syncId, playerInventory, ScreenHandlerContext.EMPTY);
     }
 
-    // Server Constructor
+    /**
+     * Server Constructor
+     * @param syncId
+     * The syncId for Client-Server Synchronization
+     * @param playerInventory
+     * The PlayerInventory of the PlayerEntity that opened the ScreenHandler
+     * @param context
+     * The ScreenHandlerContext
+     */
     public BlueprintBuildingTableScreenHandler(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
         super(ModScreenHandlers.BLUEPRINT_BUILDING_TABLE, syncId);
         this.context = context;
@@ -70,12 +84,6 @@ public class BlueprintBuildingTableScreenHandler extends AbstractBlueprintBuildi
     @Override
     public boolean canUse(PlayerEntity player) {
         return canUse(this.context, player, ModBlocks.BLUEPRINT_BUILDING_TABLE);
-    }
-
-    @Override
-    public void onClosed(PlayerEntity player) {
-        super.onClosed(player);
-        this.context.run((world, pos) -> this.dropInventory(player, this));
     }
 
     @Override
@@ -126,31 +134,30 @@ public class BlueprintBuildingTableScreenHandler extends AbstractBlueprintBuildi
 
     @Override
     public void setStack(int slotIndex, ItemStack stack) {
-        if (slotIndex == SlotIndex.BLUEPRINT.index()) this.blueprint = stack;
-        if (slotIndex == SlotIndex.BASE.index()) this.base = stack;
-        if  (slotIndex == SlotIndex.RESULT.index()) this.result = stack;
-        this.markDirty();
+        if (slotIndex == SlotIndex.BLUEPRINT.index()) {
+            this.blueprint = stack;
+            this.markDirty();
+        } else if (slotIndex == SlotIndex.BASE.index()) {
+            this.base = stack;
+            this.markDirty();
+        } else if  (slotIndex == SlotIndex.RESULT.index()) {
+            this.result = stack;
+        }
     }
 
     @Override
     public void markDirty() {
-        PocketContraptions.LOGGER.info("markDirty called");
+        this.result = ItemStack.EMPTY;
+        PocketContraptions.LOGGER.info("markDirty called by {}", (this.context.equals(ScreenHandlerContext.EMPTY) ? "Client" : "Server"));
         context.run((world, blockPos) -> {
             PocketContraptions.LOGGER.info("Entered context call");
             if (!world.isClient()) {
-                ItemStack result = updateRecipe((ServerWorld) world, this);
-                PocketContraptions.LOGGER.info("Crafting {}", result);
-                if (!result.isEmpty() &&
-                        // Item count is valid
-                        result.getCount() + this.result.getCount() < this.getSlot(SlotIndex.RESULT.index()).getMaxItemCount(result) &&
-                        // Item type is valid
-                        this.result.isEmpty() || ItemStack.areItemsAndComponentsEqual(result, this.result)) {
-                    PocketContraptions.LOGGER.info("Craft successful, result is now {}", this.result);
-                    this.base.decrement(1);
-                    if (this.result.isEmpty()) this.result = result;
-                    else this.result.increment(result.getCount());
-                    PocketContraptions.LOGGER.info("Crafted, result is now {} by adding {}", this.result, result);
-                    super.onContentChanged(this);
+                ItemStack result = this.updateRecipe((ServerWorld) world, this.plan);
+                if (!result.isEmpty()) {
+                    PocketContraptions.LOGGER.info("Crafting {}", result);
+                    this.getSlot(SlotIndex.RESULT.index()).setStack(result);
+//                    this.result = result;
+                    PocketContraptions.LOGGER.info("Craft successful, result is now {}", this.getSlot(SlotIndex.RESULT.index()).getStack());
                 }
             }
         });
@@ -181,5 +188,27 @@ public class BlueprintBuildingTableScreenHandler extends AbstractBlueprintBuildi
         this.blueprint = ItemStack.EMPTY;
         this.base = ItemStack.EMPTY;
         this.result = ItemStack.EMPTY;
+    }
+
+    @Override
+    protected boolean canTakeResult() {
+        boolean canTakeResult = this.plan.verify();
+        if (!canTakeResult) {
+            this.markDirty();
+        }
+        return canTakeResult;
+    }
+
+    @Override
+    protected void onResultTaken() {
+        if (this.plan.extract())
+            this.base.decrement(1);
+    }
+
+    @Override
+    public void onClosed(PlayerEntity player) {
+        this.result = ItemStack.EMPTY;
+        super.onClosed(player);
+        this.context.run((world, pos) -> this.dropInventory(player, this));
     }
 }
