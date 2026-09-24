@@ -28,7 +28,7 @@ import java.util.Set;
 
 @SuppressWarnings("unused")
 public class PocketDimension {
-    private static MinecraftServer server;
+    private static MinecraftServer server = null;
 
     // Retrieve pocket dimension resources
     public static final RegistryKey<DimensionOptions> DIM = RegistryKey.of(RegistryKeys.DIMENSION,
@@ -122,5 +122,6 @@ public class PocketDimension {
                 PocketDimension.getDim(dimID);
             }
         });
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> PocketDimension.server = null);
     }
 }

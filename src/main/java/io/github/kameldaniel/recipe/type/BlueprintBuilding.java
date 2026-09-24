@@ -27,6 +27,12 @@ import java.util.*;
 public class BlueprintBuilding implements Recipe<BlueprintBuildingInput> {
     private static final List<Identifier> ids = new ArrayList<>();
 
+    public static final BlueprintBuilding EMPTY = new BlueprintBuilding(
+            PocketContraptions.id("empty"),
+            Ingredient.ofItem(Items.AIR),
+            Ingredient.ofItem(Items.AIR),
+            ItemStack.EMPTY, List.of());
+
     final Identifier id;
     final Ingredient blueprint;
     final Ingredient base;
@@ -118,6 +124,8 @@ public class BlueprintBuilding implements Recipe<BlueprintBuildingInput> {
     }
 
     public record Checklist(List<CountedIngredient> required, List<CountedIngredient> available) {
+        public static final Checklist EMPTY = new Checklist(List.of(), List.of());
+
         public static final Codec<Checklist> CODEC = RecordCodecBuilder.create(
                 instance -> instance.group(
                         CountedIngredient.CODEC.listOf().optionalFieldOf("required", List.of()).forGetter(Checklist::required),
