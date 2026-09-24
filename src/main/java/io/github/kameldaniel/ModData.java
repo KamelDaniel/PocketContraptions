@@ -10,13 +10,13 @@ import net.minecraft.world.World;
 import java.util.Objects;
 
 public class ModData extends PersistentState {
-    public int nextDimID;
+    public int nextDimKey;
 
     /**
      * Constructor for a new world that does not yet have ModData stored.
      */
     private ModData() {
-        this.nextDimID = 0;
+        this.nextDimKey = 0;
     }
 
     /**
@@ -25,7 +25,7 @@ public class ModData extends PersistentState {
      * The value stored in the server
      */
     private ModData(int nextDimID) {
-        this.nextDimID = nextDimID;
+        this.nextDimKey = nextDimID;
     }
 
     /**
@@ -34,7 +34,7 @@ public class ModData extends PersistentState {
      * nextDimID in ModData
      */
     private int getSaveData() {
-        return this.nextDimID;
+        return this.nextDimKey;
     }
 
     // The Codec that stores nextDimID on the server
@@ -69,8 +69,8 @@ public class ModData extends PersistentState {
      * @return
      * the id of the next pocket dimension
      */
-    public int getDimID() {
+    public int getDimKey() {
         super.markDirty();
-        return nextDimID++;
+        return nextDimKey++;
     }
 }

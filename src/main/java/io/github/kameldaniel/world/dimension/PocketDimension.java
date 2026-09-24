@@ -26,7 +26,10 @@ import java.util.Set;
 
 // WORLD BORDER: -29999983, 29999983
 
+@SuppressWarnings("unused")
 public class PocketDimension {
+    private static MinecraftServer server;
+
     // Retrieve pocket dimension resources
     public static final RegistryKey<DimensionOptions> DIM = RegistryKey.of(RegistryKeys.DIMENSION,
             Identifier.of(PocketContraptions.MOD_ID, "pocket_dimension"));
@@ -36,19 +39,17 @@ public class PocketDimension {
             Identifier.of(PocketContraptions.MOD_ID, "pocket_dimension_type"));
 
     /**
-     * Returns the RuntimeWorldHandle on MinecraftServer server with id pocket_dimension_[dimKey].
+     * Returns the RuntimeWorldHandle with id pocket_dimension_[dimKey].
      * If the RuntimeWorldHandle does not yet exist, it is created and returned.
-     * @param server
-     * the MinecraftServer containing the dimension
-     * @param dimID
+     * @param dimKey
      * the dimKey of the pocket dimension (most likely from a QuantumCore)
      * @return
      * the RuntimeWorldHandle of the pocket dimension if it exists, or if it does not,
      * creates a new on and returns it.
      */
-    public static ServerWorld getDim(MinecraftServer server, int dimID) {
-        if (dimID < 0) throw new IllegalArgumentException("dimKey must be non-negative");
-        String dimName = "pocket_dimension_" + dimID;
+    public static ServerWorld getDim(int dimKey) {
+        if (dimKey < 0) throw new IllegalArgumentException("dimKey must be non-negative");
+        String dimName = "pocket_dimension_" + dimKey;
         Fantasy fantasy = Fantasy.get(server);
         RuntimeWorldConfig config =  new RuntimeWorldConfig()
                 .setDimensionType(DIMENSION_TYPE)
@@ -95,7 +96,7 @@ public class PocketDimension {
      * the dimKey of the dimension. The dimension tag will be pocket_dimension_[dimKey].
      */
     public static int createPocketDimension(MinecraftServer server) {
-        return ModData.getModData(server).getDimID();
+        return ModData.getModData(server).getDimKey();
     }
 
     /**
@@ -107,7 +108,7 @@ public class PocketDimension {
      */
     public static void tpEntity(Entity entity, int dimID) {
         Set<PositionFlag> flags = Collections.emptySet();
-        entity.teleport(PocketDimension.getDim(entity.getServer(), dimID),
+        entity.teleport(PocketDimension.getDim(dimID),
                 0, 66, 0, flags, entity.getYaw(), entity.getPitch(), false);
         if (entity instanceof PlayerEntity player)
             player.sendMessage(Text.literal("Welcome to Pocket Dimension " + dimID), false);
@@ -116,8 +117,9 @@ public class PocketDimension {
     public static void initialize() {
         // This allows the entity to spawn in a pocket dimension if they logged off in one
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-            for (int dimID = 0; dimID < ModData.getModData(server).nextDimID; dimID++) {
-                PocketDimension.getDim(server, dimID);
+            PocketDimension.server = server;
+            for (int dimID = 0; dimID < ModData.getModData(server).nextDimKey; dimID++) {
+                PocketDimension.getDim(dimID);
             }
         });
     }

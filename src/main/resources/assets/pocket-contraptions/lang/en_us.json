@@ -1,6 +1,9 @@
 {
+  "block.pocket-contraptions.blueprint_building_table": "Blueprint Building Table",
+  "item.pocket-contraptions.blueprint": "Blueprint",
+  "block.pocket-contraptions.pocket_contraption": "Pocket Contraption",
   "block.pocket-contraptions.blueprint_builder": "Blueprint Builder",
   "container.pocket-contraptions.blueprint_building": "Blueprint Building",
   "item.pocket-contraptions.blueprint_builder": "Blueprint Builder",
-  "item.pocket-contraptions.blueprint": "Blueprint"
+  "tooltip.pocket-contraptions.dim_key": "Attached Dim Key: %1$s"
 }

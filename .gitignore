@@ -40,4 +40,4 @@ replay_*.log
 *.jfr
 
 # Dev Resources
-Dev Resources/
+/Dev Resources/

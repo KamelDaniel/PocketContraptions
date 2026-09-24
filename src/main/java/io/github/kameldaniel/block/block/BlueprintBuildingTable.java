@@ -4,10 +4,10 @@ import io.github.kameldaniel.screenhandler.BlueprintBuildingTableScreenHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -17,7 +17,9 @@ import net.minecraft.world.World;
 public class BlueprintBuildingTable extends Block {
     private static final Text TITLE = Text.translatable("container.pocket-contraptions.blueprint_building");
     public BlueprintBuildingTable(Settings settings) {
-        super(settings);
+        super(settings
+                .strength(2.5f)
+                .sounds(BlockSoundGroup.WOOD));
     }
 
     @Override

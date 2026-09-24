@@ -12,7 +12,6 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import java.util.function.Function;
 
 public class ModItems {
@@ -20,7 +19,7 @@ public class ModItems {
     public static final RegistryKey<ItemGroup> CUSTOM_ITEM_GROUP_KEY =
             RegistryKey.of(Registries.ITEM_GROUP.getKey(), PocketContraptions.id("item_group"));
     public static final ItemGroup CUSTOM_ITEM_GROUP = FabricItemGroup.builder()
-            .icon(() -> new ItemStack(Registries.ITEM.get(Identifier.ofVanilla("diamond_block"))))
+            .icon(() -> new ItemStack(ModBlocks.BLUEPRINT_BUILDING_TABLE.asItem()))
             .displayName(Text.literal("Pocket Contraptions"))
             .build();
 
@@ -56,9 +55,10 @@ public class ModItems {
         // Register Item Group and add Items
         Registry.register(Registries.ITEM_GROUP, CUSTOM_ITEM_GROUP_KEY, CUSTOM_ITEM_GROUP);
         ItemGroupEvents.modifyEntriesEvent(CUSTOM_ITEM_GROUP_KEY).register(itemGroup -> {
+            itemGroup.add(ModBlocks.BLUEPRINT_BUILDING_TABLE.asItem());
             itemGroup.add(ModItems.BLUEPRINT);
-            itemGroup.add(ModBlocks.BLUEPRINT_BUILDER.asItem());
             itemGroup.add(ModBlocks.POCKET_CONTRAPTION.asItem());
+            itemGroup.add(ModBlocks.BLUEPRINT_BUILDER.asItem());
         });
     }
 }

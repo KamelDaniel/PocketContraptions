@@ -6,7 +6,6 @@ import io.github.kameldaniel.block.entity.BlueprintBuilderEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.screen.*;
 import net.minecraft.state.StateManager;
@@ -28,7 +27,7 @@ public class BlueprintBuilder extends FacingBlock implements BlockEntityProvider
 
     public BlueprintBuilder(Settings settings) {
         super(settings);
-        this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
+        super.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
     }
 
     @Override
@@ -70,7 +69,10 @@ public class BlueprintBuilder extends FacingBlock implements BlockEntityProvider
         boolean newPowered = world.isReceivingRedstonePower(pos);
         if (newPowered != powered) {
             powered = newPowered;
-            if (powered) ((BlueprintBuilderEntity) world.getBlockEntity(pos)).attemptCraft();
+            if (powered) {
+                BlueprintBuilderEntity entity = (BlueprintBuilderEntity) world.getBlockEntity(pos);
+                if (entity != null) entity.attemptCraft();
+            }
         }
     }
 

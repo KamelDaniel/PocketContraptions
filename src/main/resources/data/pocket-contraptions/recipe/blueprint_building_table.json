@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " B ",
+    "PCP",
+    " R "
+  ],
+  "key": {
+    "B": "pocket-contraptions:blueprint",
+    "P": "minecraft:piston",
+    "C": "minecraft:crafting_table",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "pocket-contraptions:blueprint_building_table"
+  }
+}

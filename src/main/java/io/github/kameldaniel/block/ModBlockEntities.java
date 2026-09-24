@@ -2,6 +2,7 @@ package io.github.kameldaniel.block;
 
 import io.github.kameldaniel.PocketContraptions;
 import io.github.kameldaniel.block.entity.BlueprintBuilderEntity;
+import io.github.kameldaniel.block.entity.PocketContraptionEntity;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
@@ -12,6 +13,8 @@ import net.minecraft.util.Identifier;
 
 public class ModBlockEntities {
     // BlockEntity Registration
+    public static final BlockEntityType<PocketContraptionEntity> POCKET_CONTRAPTION =
+            register("pocket_contraption_entity", PocketContraptionEntity::new, ModBlocks.POCKET_CONTRAPTION);
     public static final BlockEntityType<BlueprintBuilderEntity> BLUEPRINT_BUILDER =
             register("blueprint_builder_entity", BlueprintBuilderEntity::new, ModBlocks.BLUEPRINT_BUILDER);
 

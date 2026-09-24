@@ -14,7 +14,7 @@ public class ModComponents {
     // Register Components
     public static final ComponentType<Integer> DIM_KEY = Registry.register(
             Registries.DATA_COMPONENT_TYPE,
-            PocketContraptions.id("dim_id"),
+            PocketContraptions.id("dim_key"),
             ComponentType.<Integer>builder().codec(Codec.INT).build()
     );
     public static final ComponentType<BlueprintBuilding> BLUEPRINT_RECIPE = Registry.register(
